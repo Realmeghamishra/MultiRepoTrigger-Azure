@@ -1,0 +1,42 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+  - repository: repo_b
+    type: git
+    name: Mg-POC/repo_b
+    ref: main
+    trigger:
+      branches:
+        include:
+        - main
+
+  - repository: MultiRepoTrigger-Azure
+    type: github
+    endpoint: MgServiceConnection
+    name: Realmeghamishra/MultiRepoTrigger-Azure
+    ref: main
+    trigger:
+      branches:
+        include:
+        - main
+
+stages:
+  - stage: Build
+    jobs:
+      - job: BuildJob
+        steps:
+          - checkout: self
+          - checkout: repo_b
+          - checkout: MultiRepoTrigger-Azure
+          - script: echo "This is a message from the Build stage!"
+            displayName: "Echo message"
